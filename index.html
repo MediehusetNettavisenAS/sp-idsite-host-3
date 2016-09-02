@@ -1,0 +1,402 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <title>Login</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,300,400italic,400,600italic,600,700italic,700,800italic,800" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="stylesheet" href="styles/main.css">
+
+    <script src="scripts/vendor.js"></script>
+  </head>
+  <body ng-app="stormpathIdpApp">
+    <script type="text/ng-template" id="views/login.html">
+      <div class="view login-view" ng-show="ready">
+        <div class="info-container" ng-if="applicationName =='newsletter'">
+            <p class="info-txt">Motta vårt nyhetsbrev ved å registrere deg som Nettavisen-bruker her</p>
+            <div class="arrow">&nbsp;</div>
+            <script type="text/javascript" src="http://nginx-60m.nettavisen.no/l.lp4.io/app/50/48/67/50486792d9d93ec413000000.js"></script>
+        </div>
+        <div class="provider-area  col-xs-12 col-sm-4" ng-show="hasProviders">
+          <button ng-repeat="provider in providers" class="btn btn-social btn-{{provider.providerId}}" ng-click="providerLogin(provider)">Logg inn med ett klikk!</button>
+        </div>
+        <div class="box row">
+          <div class="email-password-area  col-xs-12" ng-class="[hasProviders ? 'small col-sm-8' : 'large col-sm-12']">
+            <div class="header">
+              <span>eller med e-post</span>
+            </div>
+            <div class="alert alert-danger bad-login" ng-show="errors.badLogin">
+              Feil brukernavn eller passord.
+            </div>
+            <div class="alert alert-danger not-found" ng-show="errors.notFound">
+              <span>Kontoen eksisterer ikke. ønsker du å </span>
+              <a href="#/register">opprette en konto?</a>
+              <span>?</span>
+            </div>
+            <div class="alert alert-danger" ng-show="errors.unknown">En ukjent feil har oppstått</div>
+            <div class="alert alert-danger" ng-show="errors.emailPasswordRequired">Vennligst skriv inn e-postadresse og passord</div>
+            <div class="alert alert-danger" ng-show="errors.userMessage">
+              <strong>Beklager, men en feil har oppstått. Vennligst last siden på nytt.</strong>
+              <br/>
+              <br/>
+              <p>{{errors.userMessage}}</p>
+            </div>
+            <form class="login-form form-horizontal" role="form" ng-submit="submit()">
+              <div class="form-group group-email" ng-show="showOrganizationField" ng-class="{'has-error': (errors.organizationNameKeyInvalid || errors.organizationNameKeyRequired)}">
+                <label ng-class="[hasProviders ? 'col-sm-12' : 'col-sm-4']">Organisasjon</label>
+                <div ng-class="[hasProviders ? 'col-sm-12' : 'col-sm-8']">
+                  <input class="form-control" type="text" name="organizationNameKey" ng-model="organizationNameKey" placeholder="Organization" ng-disabled="disableOrganizationField"/>
+
+                  <span ng-if="errors.organizationNameKeyRequired" class="help-block">
+                    Organisasjonsnavn er påkrevd.
+                  </span>
+                  <span ng-if="errors.organizationNameKeyInvalid" class="help-block">
+                    Ugyldig organisasjonsnavn.
+                  </span>
+                </div>
+              </div>
+              <div class="form-group group-email">
+                <label ng-class="[hasProviders ? 'col-sm-12' : 'col-sm-4']">E-post</label>
+                <div ng-class="[hasProviders ? 'col-sm-12' : 'col-sm-8']">
+                  <input class="form-control" type="text" name="username" ng-model="username" placeholder="Email"/>
+                </div>
+              </div>
+              <div class="form-group group-password">
+                <label ng-class="[hasProviders ? 'col-sm-12' : 'col-sm-4']">Passord</label>
+                <div ng-class="[hasProviders ? 'col-sm-12' : 'col-sm-8']">
+                  <input class="form-control" type="password" name="password" ng-model="password" placeholder="Password"/>
+                </div>
+              </div>
+              <div class="form-group group-remember-me">
+                <div class="col-sm-8" ng-class="[hasProviders ? '' : 'col-sm-offset-4']">
+                  <input type="checkbox" id="remember">
+                  <label for="remember">Husk meg</label>
+                  <a class="forgot" href="#forgot">Glemt passord? Trykk her</a>
+                </div>
+              </div>
+              <div class="login-controls">
+                <button class="login btn btn-login btn-sp-green" type="submit" ng-disabled="submitting">Logg inn</button>
+                <a href="#register" class="login btn btn-login btn-sp-green inverse" type="submit" ng-disabled="submitting">Opprett konto</a>
+              </div>
+            </form>
+          </div>    
+
+        </div>
+
+         <div class="box row">
+          <div class="email-password-area  col-xs-12" ng-class="[hasProviders ? 'small col-sm-8' : 'large col-sm-12']">
+            <p>For å bruke denne tjenesten må du opprette en Nettavisen-bruker eller logge inn med din eksisterende bruker.
+              <span class="link" ng-click="showInfo = !showInfo;">Hva er Nettavisen-ID?</span>
+            </p>
+            <p ng-show="showInfo">Din bruker på Nettavisen gir deg mulighet til å logge inn på tjenester hos Nettavisen som kommentarfelt og nyhetsbrev. Brukeren din er personlig, og dine data beskyttes av vår datapolicy (<a href="http://www.nettavisen.no/datapolicy.html">http://www.nettavisen.no/datapolicy.html</a>).
+      Hvis du ønsker å slette din bruker kan du når som helst gjøre det. Nettavisen vil aldri selge dine innloggingsdata.</p>
+          </div>
+        </div>
+
+      </div>
+
+
+
+    </script>
+    <script type="text/ng-template" id="views/registration.html">
+      <div class="view registration-view">
+        <div class="box row">
+          <div class="col-sm-12">
+            <div class="header">
+              <span class="button-na top"></span><span>Lag en NAID-konto</span>
+            </div>
+            <form class="registration-form form-horizontal sp-form" role="form" ng-controller="RegistrationFormCtrl" ng-submit="submit()">
+              <div class="alert alert-danger" ng-show="unknownError">
+                <strong>Beklager det oppstod en feil. Vennligst last siden omigjen og prøv på nytt.</strong>
+                <br/>
+                <br/>
+                <p>{{unknownError}}</p>
+              </div>
+              <div class="form-group group-first-name" form-group>
+                <label class="col-sm-4">Fornavn</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" name="givenName" form-control name-validation validate-on-blur/>
+                  <small class="help-block" ng-show="validationError">Fornavn er påkrevd</small>
+                </div>
+              </div>
+
+              <div class="form-group group-last-name" form-group>
+                <label class="col-sm-4">Etternavn</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" name="surname" form-control name-validation validate-on-blur/>
+                  <small class="help-block" ng-show="validationError">Etternavn er påkrevd</small>
+                </div>
+              </div>
+
+              <div class="form-group group-email" form-group>
+                <label class="col-sm-4">E-postadresse</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" name="email" form-control email-validation validate-on-blur/>
+                  <small class="help-block duplicate-user" ng-show="errors.duplicateUser">Denne e-postadressen er allerede registrert. <a class="forgot" href="#forgot">Er det din e-postadresse? Tilbakestill passord her</a></small>
+                  <small class="help-block validation-error" ng-show="validationError">Denne e-postadressen kan ikke brukes.</small>
+                </div>
+              </div>
+
+              <div class="form-group group-password" form-group>
+                <label class="col-sm-4">Passord</label>
+                <div class="col-sm-8">
+                  <input type="password" class="form-control" name="password" form-control password-policy-validation validate-on-blur/>
+                  <div ng-include="'views/password-error-messages.html'"></div>
+                </div>
+              </div>
+
+              <div class="form-group group-confirm-password" form-group>
+                <label class="col-sm-4">Bekreft passord</label>
+                <div class="col-sm-8">
+                  <input type="password" class="form-control" name="passwordConfirm" form-control password-match-validation validate-on-blur/>
+                  <small class="help-block" ng-show="validationError">Passordene stemte ikke overens</small>
+                </div>
+              </div>
+
+              <button class="btn btn-register btn-sp-green" type="submit" ng-disabled="submitting">Opprett konto</button>
+
+            </form>
+          </div>
+        </div>
+        <a class="to-login" href="#/">Tilbake til innlogging</a>
+      </div>
+    </script>
+    <script type="text/ng-template" id="views/forgot.html">
+      <div class="view forgot-view" ng-show="ready">
+        <div class="box row">
+          <div class="col-sm-12">
+            <div class="header">
+              <span ng-show="!sent && !retry">Tilbakestill passord</span>
+              <span ng-show="retry">Lenken du fulgte har gått ut på dato</span>
+              <span ng-show="sent">Vennligst sjekk din e-post.</span>
+
+            </div>
+            <div class="wd-sent" ng-show="sent">
+              <p>
+                <span>Vi har nå sendt en tilbakestillingslenke for passord til:</span>
+                <strong>{{fields.email.value}}</strong>.
+              </p>
+              <p>&nbsp;</p>
+            </div>
+            <form class="forgot-form form-horizontal sp-form" role="form" ng-submit="submit()" ng-show='!sent'>
+
+              <div class="form-group group-email" ng-show="showOrganizationField" ng-class="{'has-error': (errors.organizationNameKeyInvalid || errors.organizationNameKeyRequired)}">
+                <label class="col-sm-6">Organisasjon</label>
+                <div class="col-sm-6">
+                  <input class="form-control" type="text" name="organizationNameKey" ng-model="organizationNameKey" placeholder="Organization" ng-disabled="disableOrganizationField"/>
+
+                  <span ng-if="errors.organizationNameKeyRequired" class="help-block">
+                    Et organisasjonsnummer er påkrevd.
+                  </span>
+                  <span ng-if="errors.organizationNameKeyInvalid" class="help-block">
+                    Ugyldig organisasjonsnummer.
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-group group-email" ng-class="{'has-error':notFound}" form-group>
+                <label class="col-sm-6" ng-hide="retry">Send instruksjoner for å tilbakestille passord til:</label>
+                <label class="col-sm-6" ng-show="retry">Send e-post med instruksjoner til:</label>
+                <div class="col-sm-6">
+                  <input type="text" class="form-control" name="email" placeholder="Email" form-control email-validation validate-on-blur/>
+                  <small class="help-block wd-invalid-email" ng-show="validationError">Dette er ikke en e-postadresse</small>
+                  <small class="help-block wd-not-found" ng-show="notFound"><span>Denne kontoen eksisterer ikke i vårt system.</span></small>
+                </div>
+              </div>
+              <div class="alert alert-danger" ng-show="unknownError">
+                <strong>Beklager det har oppstått en feil, vennligst last siden på nytt og prøv igjen.</strong>
+                <br/>
+                <br/>
+                <p>{{unknownError}}</p>
+              </div>
+              <button class="btn btn-forgot btn-sp-green" ng-disabled="submitting" type="submit">Tilbakestill passord<</button>
+            </form>
+          </div>
+        </div>
+        <a ng-show="!sent" class="to-login" href="#/" wd-back-to-login>Tilbake til innlogging</a>
+      </div>
+    </script>
+    <script type="text/ng-template" id="views/reset.html">
+      <div class="view reset-view" ng-show="status!=='loading'">
+        <div class="box row">
+          <div class="col-sm-12">
+            <div class="header">
+              <span ng-show="status=='verified'">Tilbakestill passord</span>
+              <span ng-show="status=='failed'">Beklager! Noe gikk galt.</span>
+              <span ng-show="status=='success'">Du har nå tilbakestilt passordet ditt.</span>
+            </div>
+            <div ng-show="status=='failed'">
+              <p>
+                <span>Beklager, du må be om en ny e-post med passord reset.</span>
+                <a href="#/forgot">Trykk her for å prøve igjen.</a>
+              </p>
+              <p>&nbsp;</p>
+            </div>
+            <div wd-success ng-show="status==='success'">
+              <p>
+                <span>Du kan nå </span>
+                <a href="#/">logge inn</a>
+              </p>
+              <p>&nbsp;</p>
+            </div>
+            <div ng-show="error" class="alert alert-danger">
+              <p><strong>Feilmeldingen var:</strong></p>
+              <p>{{error}}</p>
+            </div>
+
+            <form class="reset-form form-horizontal sp-form" role="form" ng-show="status=='verified'" ng-submit="submit()">
+              <div class="form-group group-password" form-group>
+                <label class="col-sm-4">Nytt passord</label>
+                <div class="col-sm-8">
+                  <input type="password" class="form-control" name="password" form-control password-policy-validation validate-on-blur/>
+                  <div ng-include="'views/password-error-messages.html'"></div>
+                </div>
+              </div>
+
+              <div class="form-group group-confirm-password" form-group>
+                 <label class="col-sm-4">Bekreft passord</label>
+                <div class="col-sm-8">
+                  <input type="password" class="form-control" name="passwordConfirm" form-control password-match-validation validate-on-blur/>
+                   <small wd-pw-mismatch class="help-block" ng-show="validationError">Passordene du skrev er ikke like</small>
+                </div>
+              </div>
+              <div class="alert alert-danger" ng-show="unknownError">
+                 <strong>Beklager en feil oppstod, vennligst prøv igjen.</strong>
+                <br/>
+                <br/>
+                <p>{{unknownError}}</p>
+              </div>
+              <button class="btn btn-reset btn-sp-green" type="submit" ng-disabled="submitting">Send inn</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </script>
+    <script type="text/ng-template" id="views/verify.html">
+      <div class="view verify-view" ng-show="status!=='loading'">
+        <div class="box row">
+          <div class="col-sm-12">
+            <div class="header">
+              <span ng-show="status=='verified'">Your account has been successfully created</span>
+              <span ng-show="status=='failed'">Sorry, there was an error while verifying your account</span>
+            </div>
+            <div class="verified" ng-show="status=='verified'">
+              <p>
+                <span>Success!  Your account is ready, please </span>
+                <a href="#/">log in</a>
+              </p>
+            </div>
+            <div ng-show="error" class="alert alert-danger">
+                <strong>{{error}}</strong>
+            </div>
+            <div class="verification-failed" ng-show="status=='failed'">
+              <p>
+                <span>Please try again by clicking on the verification link that was sent to your email address.</span>
+              </p>
+              <p>
+                <span>If you continue to have problems you may need to</span>
+                <a href="#/register">register</a>
+                <span>again.</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </script>
+    <script type="text/ng-template" id="views/unverified.html">
+      <div class="view unverified-view">
+        <div class="box row">
+          <div class="col-sm-12">
+            <div class="header">
+              <span>Check Your Email</span>
+            </div>
+            <p>Your account has been successfully created!  Check your email and activate your account.</p>
+          </div>
+        </div>
+      </div>
+    </script>
+    <script type="text/ng-template" id="views/error.html">
+      <div class="view error-view">
+        <div class="row">
+          <div class="col-sm-12">
+          <p>&nbsp;</p>
+          <h2 class="text-center">Beklager det oppstod et problem.</h2>
+          <hr>
+            <div class="alert alert-warning">
+              <p>
+                Vennligst bruke tilbakeknappen i nettleseren din, og prøv igjen.
+              </p>
+            </div>
+
+            <p class="alert">
+              Hvis problemet gjentar seg, vennligst ta kontakt med moderator 
+            </p>
+
+            <div class="well text-center">
+              <div class="" ng-repeat="e in errors">
+                <strong>{{e}}</strong>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </script>
+    <script type="text/ng-template" id="views/password-error-messages.html">
+      <small class="help-block" ng-show="errors.minLength" wd-minLength>Passordet er for kort</small>
+      <small class="help-block" ng-show="errors.maxLength" wd-maxLength>Passordet er for langt</small>
+      <small class="help-block" ng-show="errors.requireNumeric" wd-requireNumeric>Passordet må inneholdet et nummer</small>
+      <small class="help-block" ng-show="errors.requireDiacritical" wd-requireDiacritical>Passord må inneholde et spesialtegn</small>
+      <small class="help-block" ng-show="errors.requireUpperCase" wd-requireUpperCase>Passordet må inneholde minst en stor bokstav</small>
+      <small class="help-block" ng-show="errors.requireLowerCase" wd-requireLowerCase>passordet må inneholde minst en liten bokstav</small>
+
+    </script>
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="container" ng-controller="ErrorCtrl" ng-cloak>
+      <div class="logo-container">
+        <img ng-show="logoUrl" class="logo img-responsive" ng-src="{{logoUrl}}"/>
+      </div>
+      <div ng-show="inError" ng-include="'views/error.html'"></div>
+      <div ng-hide="inError" ng-view="">
+        <!-- this will be replaced a the view, as determined by the route config in app.js -->
+      </div>
+    </div>
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-XXXXX-X');
+      ga('send', 'pageview');
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="scripts/iecompat.js"></script>
+    <![endif]-->
+
+    <script src="scripts/app.js"></script>
+
+
+    <script type="text/javascript">
+      (function() {
+       var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+       po.src = 'https://apis.google.com/js/client:plusone.js';
+       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+     })();
+    </script>
+  </body>
+</html>
