@@ -19,11 +19,11 @@
   <body ng-app="stormpathIdpApp">
     <script type="text/ng-template" id="views/login.html">
       <div class="view login-view" ng-show="ready">
-        <div class="info-container" ng-if="applicationName =='newsletter'">
+        <!--<div class="info-container" ng-if="applicationName =='newsletter'">
             <p class="info-txt">Motta vårt nyhetsbrev ved å registrere deg som Nettavisen-bruker her</p>
             <div class="arrow">&nbsp;</div>
             <script type="text/javascript" src="https://www.nettavisen.no/templates/v1/resources/lp4.js"></script>
-        </div>
+        </div>-->
         <div class="provider-area  col-xs-12 col-sm-4" ng-show="hasProviders">
           <button ng-repeat="provider in providers" class="btn btn-social btn-{{provider.providerId}}" ng-click="providerLogin(provider)">Logg inn med ett klikk!</button>
         </div>
